@@ -22,6 +22,7 @@ package transport
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"runtime/debug"
@@ -70,7 +71,7 @@ func InvokeUnaryHandler(
 	err = i.Handler.Handle(i.Context, i.Request, i.ResponseWriter)
 
 	// The handler stopped work on context deadline.
-	if err == context.DeadlineExceeded && err == i.Context.Err() {
+	if errors.Is(err, context.DeadlineExceeded) && errors.Is(i.Context.Err(), context.DeadlineExceeded) {
 		deadline, _ := i.Context.Deadline()
 		err = yarpcerrors.Newf(
 			yarpcerrors.CodeDeadlineExceeded,
